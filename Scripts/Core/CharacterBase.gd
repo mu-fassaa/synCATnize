@@ -1,14 +1,24 @@
 extends CharacterBody2D
 
 signal interaction_target_changed(interactable: Area2D)
+signal state_changed(new_state: CharacterState)
+
+enum CharacterState { IDLE, WALK, RUN, INTERACT, DISABLED }
 
 @export_category("Movement Settings")
 @export var speed: float = 150.0
+@export var run_speed: float = 220.0 # Not too fast, normal is 150.0
 @export var acceleration: float = 1200.0
 @export var friction: float = 1400.0
 
 var is_human: bool = false
 var speed_modifier: float = 1.0
+
+var current_state: CharacterState = CharacterState.IDLE:
+	set(value):
+		if current_state != value:
+			current_state = value
+			state_changed.emit(current_state)
 
 var is_active: bool:
 	get:
@@ -29,15 +39,36 @@ func _ready():
 
 func _physics_process(delta):
 	var input_dir = Vector2.ZERO
-	if is_active:
-		input_dir = InputManager.get_movement_vector()
+	var target_speed = 0.0
+	
+	# Only allow input if the state is IDLE, WALK, or RUN
+	if current_state != CharacterState.DISABLED and current_state != CharacterState.INTERACT:
+		if is_active:
+			input_dir = InputManager.get_movement_vector()
+			
+		if input_dir != Vector2.ZERO:
+			# If shift is pressed, transition to RUN state
+			if Input.is_key_pressed(KEY_SHIFT):
+				current_state = CharacterState.RUN
+				target_speed = run_speed
+			else:
+				current_state = CharacterState.WALK
+				target_speed = speed
+			_play_walk_animation(input_dir)
+		else:
+			current_state = CharacterState.IDLE
+			target_speed = 0.0
+			_play_idle_animation()
+	else:
+		# If DISABLED or INTERACT, decelerate to zero
+		target_speed = 0.0
+		_play_idle_animation()
 		
-	if input_dir != Vector2.ZERO:
-		velocity = velocity.move_toward(input_dir * speed * speed_modifier, acceleration * delta)
-		_play_walk_animation(input_dir)
+	# Move character towards target speed
+	if input_dir != Vector2.ZERO and current_state != CharacterState.DISABLED and current_state != CharacterState.INTERACT:
+		velocity = velocity.move_toward(input_dir * target_speed * speed_modifier, acceleration * delta)
 	else:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
-		_play_idle_animation()
 		
 	move_and_slide()
 	
@@ -45,6 +76,10 @@ func _physics_process(delta):
 		_update_nearest_interactable()
 
 func _input(event):
+	# Block interaction inputs if character is disabled or already interacting
+	if current_state == CharacterState.DISABLED or current_state == CharacterState.INTERACT:
+		return
+		
 	if is_active and InputManager.is_interact_just_pressed():
 		_trigger_interaction()
 
@@ -74,7 +109,14 @@ func _update_nearest_interactable():
 func _trigger_interaction():
 	_update_nearest_interactable()
 	if nearest_interactable and nearest_interactable.has_method("interact"):
+		current_state = CharacterState.INTERACT
 		nearest_interactable.interact(self)
+		
+		# Return to IDLE state after a brief delay
+		get_tree().create_timer(0.2).timeout.connect(func():
+			if current_state == CharacterState.INTERACT:
+				current_state = CharacterState.IDLE
+		)
 
 func _on_interaction_area_entered(area: Area2D):
 	if area.has_method("interact") and not current_interactables.has(area):

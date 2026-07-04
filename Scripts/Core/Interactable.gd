@@ -12,6 +12,11 @@ func interact(actor: CharacterBody2D):
 	print("Interactable: ", name, " interacted with by ", actor.name)
 	_on_interact(actor)
 	interacted.emit(actor)
+	
+	# Support Composition: delegate to parent node if it implements _on_interact
+	var parent = get_parent()
+	if parent and parent.has_method("_on_interact"):
+		parent._on_interact(actor)
 
 func _on_interact(_actor: CharacterBody2D):
 	pass
