@@ -1,0 +1,118 @@
+[gd_scene load_steps=19 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Core/LevelController.gd" id="1"]
+[ext_resource type="PackedScene" path="res://Scenes/Player/Player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://Scenes/Cat/Cat.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://Scenes/Main/GameCamera.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/TransitionTrigger.tscn" id="5"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="6"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/PushableBox.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/Door.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/PressurePlate.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/Lever.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/Library/Rock.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/Library/Bush.tscn" id="12"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/Library/TallGrass.tscn" id="13"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/Library/Tree.tscn" id="14"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/Library/Fence.tscn" id="15"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/Library/Bench.tscn" id="16"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/Library/Sign.tscn" id="17"]
+[ext_resource type="PackedScene" path="res://Scenes/Objects/Library/Bridge.tscn" id="18"]
+
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(600, 40)
+
+[sub_resource type="RectangleShape2D" id="2"]
+size = Vector2(40, 500)
+
+[sub_resource type="StyleBoxFlat" id="3"]
+bg_color = Color(0, 0, 0, 0.6)
+expand_margin_left = 8.0
+expand_margin_top = 6.0
+expand_margin_right = 8.0
+expand_margin_bottom = 6.0
+
+[node name="NelayanHouse" type="Node2D"]
+script = ExtResource("1")
+
+[node name="Walls" type="StaticBody2D" parent="."]
+collision_mask = 0
+
+[node name="Floor" type="Sprite2D" parent="Walls"]
+self_modulate = Color(0.2, 0.25, 0.28, 1)
+position = Vector2(300.0, 250.0)
+scale = Vector2(4.6875, 3.90625)
+texture = ExtResource("6")
+
+[node name="TopWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(300.0, 20)
+shape = SubResource("1")
+
+[node name="BottomWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(300.0, 480)
+shape = SubResource("1")
+
+[node name="LeftWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(20, 250.0)
+shape = SubResource("2")
+
+[node name="RightWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(580, 250.0)
+shape = SubResource("2")
+
+[node name="Player" parent="." instance=ExtResource("2")]
+position = Vector2(260.0, 250.0)
+collision_mask = 3
+
+[node name="Cat" parent="." instance=ExtResource("3")]
+position = Vector2(340.0, 250.0)
+
+[node name="GameCamera" parent="." instance=ExtResource("4")]
+position = Vector2(260.0, 250.0)
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="FromForestRiver" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(300, 380)
+
+[node name="Transitions" type="Node2D" parent="."]
+
+[node name="Trigger0" parent="Transitions" instance=ExtResource("5")]
+position = Vector2(300, 450)
+target_scene = "res://Scenes/World/ForestRiver.tscn"
+target_spawn_point = "FromNelayanHouse"
+
+[node name="Table" parent="." instance=ExtResource("11")]
+position = Vector2(300, 200)
+scale = Vector2(0.8, 0.8)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Control" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TutorialLabel" type="Label" parent="CanvasLayer/Control"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 16.0
+theme_override_font_sizes/font_size = 14
+text = "NELAYANHOUSE (F1: Debug | C: Ganti Karakter)
+Rumah Nelayan (fisherman hut)."
+
+[node name="PromptLabel" type="Label" parent="CanvasLayer/Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/normal = SubResource("3")
+text = "Tekan E untuk Berinteraksi"

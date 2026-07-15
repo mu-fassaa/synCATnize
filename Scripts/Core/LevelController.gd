@@ -6,10 +6,24 @@ extends Node2D
 @onready var ui_prompt_label = get_node_or_null("CanvasLayer/Control/PromptLabel")
 
 func _ready():
+	# Position characters at transition spawn point if specified
+	if not SceneManager.next_spawn_point_name.is_empty():
+		var spawn_node = get_node_or_null("SpawnPoints/" + SceneManager.next_spawn_point_name)
+		if spawn_node:
+			var spawn_pos = spawn_node.global_position
+			if player:
+				player.global_position = spawn_pos
+			if cat:
+				cat.global_position = spawn_pos + Vector2(30, 0) # Offset slightly
+				
 	# Configure camera focus on active character by default
-	if game_camera and player:
-		game_camera.set_target(player)
-		
+	if game_camera:
+		var target = GameManager.active_character if GameManager.active_character else player
+		if target:
+			game_camera.set_target(target)
+			# Snap camera instantly to target to avoid panning on level load
+			game_camera.global_position = target.global_position
+			
 	# Connect interaction prompt updates
 	if player:
 		player.interaction_target_changed.connect(_on_interaction_target_changed)

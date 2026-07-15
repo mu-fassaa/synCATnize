@@ -6,6 +6,8 @@ signal scene_transition_finished(target_scene: String)
 var canvas_layer: CanvasLayer
 var color_rect: ColorRect
 
+var next_spawn_point_name: String = ""
+
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
@@ -20,7 +22,8 @@ func _ready():
 	color_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	canvas_layer.add_child(color_rect)
 
-func transition_to_scene(target_scene_path: String):
+func transition_to_scene(target_scene_path: String, spawn_point_name: String = ""):
+	next_spawn_point_name = spawn_point_name
 	scene_transition_started.emit(target_scene_path)
 	
 	# Lock player input and block mouse clicks during fade
