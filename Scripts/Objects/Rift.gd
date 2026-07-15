@@ -16,9 +16,17 @@ func _ready():
 	_update_visuals()
 
 # Reusable Interaction callback delegated by child Interactable component
-func _on_interact(_actor: CharacterBody2D):
+func _on_interact(actor: CharacterBody2D):
 	if current_state == RiftState.CLOSED:
 		_show_dialogue("Rift", ["Rift ini sudah ditutup. Energi di area ini telah pulih sepenuhnya."])
+		return
+		
+	# Only Cat can interact with/close the Rift
+	if actor and actor.get("is_human") == true:
+		_show_dialogue("Rift", [
+			"Gejolak energi Rift ini terlalu besar untuk manusia.",
+			"Hanya Kucing yang memiliki kepekaan spiritual untuk menyucikan Rift ini!"
+		])
 		return
 		
 	# Check if associated puzzle is solved first

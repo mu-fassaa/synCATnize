@@ -16,6 +16,7 @@ var is_completed: bool = false
 
 func _ready():
 	add_to_group("saveable")
+	add_to_group("puzzles")
 	
 	# Connect to activator signals dynamically
 	for path in required_nodes:

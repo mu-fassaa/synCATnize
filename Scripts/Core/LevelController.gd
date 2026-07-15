@@ -32,6 +32,17 @@ func _ready():
 			# Snap camera instantly to target to avoid panning on level load
 			game_camera.global_position = target.global_position
 			
+		# Apply camera bounds based on Floor size dynamically
+		var floor_node = get_node_or_null("Walls/Floor")
+		if floor_node and floor_node is Sprite2D:
+			var tex_size = floor_node.texture.get_size() if floor_node.texture else Vector2(128, 128)
+			var scaled_size = tex_size * floor_node.scale
+			var bounds = Rect2(
+				floor_node.global_position - scaled_size / 2.0,
+				scaled_size
+			)
+			game_camera.set_camera_limits(bounds)
+			
 	# Connect interaction prompt updates
 	if player:
 		player.interaction_target_changed.connect(_on_interaction_target_changed)
