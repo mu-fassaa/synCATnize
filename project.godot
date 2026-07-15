@@ -24,6 +24,9 @@ AudioManager="*res://Scripts/Managers/AudioManager.gd"
 SaveManager="*res://Scripts/Managers/SaveManager.gd"
 DebugManager="*res://Scripts/Managers/DebugManager.gd"
 EventBus="*res://Scripts/Managers/EventBus.gd"
+AbilityManager="*res://Scripts/Managers/AbilityManager.gd"
+InventoryManager="*res://Scripts/Managers/InventoryManager.gd"
+ObjectiveManager="*res://Scripts/Managers/ObjectiveManager.gd"
 
 [display]
 

@@ -51,4 +51,5 @@ func _get_save_key(node: Node) -> String:
 	var root = get_tree().current_scene
 	if root and root.is_ancestor_of(node):
 		return root.name + "/" + String(root.get_path_to(node))
-	return node.name + "_" + str(node.get_instance_id())
+	# For Autoload nodes, use the path relative to the root node (deterministic across runs)
+	return "Global/" + String(get_tree().root.get_path_to(node))

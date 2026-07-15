@@ -6,6 +6,14 @@ extends Node2D
 @onready var ui_prompt_label = get_node_or_null("CanvasLayer/Control/PromptLabel")
 
 func _ready():
+	# Standardize level container hierarchy programmatically if not present in the scene
+	_ensure_container_exists("PuzzleContainer")
+	_ensure_container_exists("NPCContainer")
+	_ensure_container_exists("CollectibleContainer")
+	_ensure_container_exists("EventTriggers")
+	_ensure_container_exists("AudioZones")
+	_ensure_container_exists("LightingZones")
+	
 	# Position characters at transition spawn point if specified
 	if not SceneManager.next_spawn_point_name.is_empty():
 		var spawn_node = get_node_or_null("SpawnPoints/" + SceneManager.next_spawn_point_name)
@@ -29,6 +37,12 @@ func _ready():
 		player.interaction_target_changed.connect(_on_interaction_target_changed)
 	if cat:
 		cat.interaction_target_changed.connect(_on_interaction_target_changed)
+
+func _ensure_container_exists(container_name: String):
+	if not has_node(container_name):
+		var node = Node2D.new()
+		node.name = container_name
+		add_child(node)
 
 func _unhandled_input(event):
 	# Switch active character on pressing C
