@@ -1,9 +1,9 @@
 extends CharacterBody2D
 
 signal interaction_target_changed(interactable: Area2D)
-signal state_changed(new_state: CharacterState)
+signal state_changed(new_state: CharacterStateEnum)
 
-enum CharacterState { IDLE, WALK, RUN, INTERACT, DISABLED }
+enum CharacterStateEnum { IDLE, WALK, RUN, INTERACT, DISABLED }
 
 @export_category("Movement Settings")
 @export var speed: float = 150.0
@@ -14,11 +14,15 @@ enum CharacterState { IDLE, WALK, RUN, INTERACT, DISABLED }
 var is_human: bool = false
 var speed_modifier: float = 1.0
 
-var current_state: CharacterState = CharacterState.IDLE:
+var current_state: CharacterStateEnum = CharacterStateEnum.IDLE:
 	set(value):
 		if current_state != value:
 			current_state = value
 			state_changed.emit(current_state)
+			EventBus.character_state_changed.emit(self, current_state)
+
+var state_handlers: Dictionary = {}
+var current_state_handler: CharacterState = null
 
 var is_active: bool:
 	get:
@@ -30,43 +34,35 @@ var nearest_interactable: Area2D = null:
 		if nearest_interactable != value:
 			nearest_interactable = value
 			interaction_target_changed.emit(nearest_interactable)
+			EventBus.interaction_target_changed.emit(self, nearest_interactable)
 
 func _ready():
+	# Initialize state handlers programmatically
+	state_handlers[CharacterStateEnum.IDLE] = CharacterStates.IdleState.new()
+	state_handlers[CharacterStateEnum.WALK] = CharacterStates.WalkState.new()
+	state_handlers[CharacterStateEnum.RUN] = CharacterStates.RunState.new()
+	state_handlers[CharacterStateEnum.INTERACT] = CharacterStates.InteractState.new()
+	state_handlers[CharacterStateEnum.DISABLED] = CharacterStates.DisabledState.new()
+	
+	for state in state_handlers.values():
+		state.character = self
+		
+	current_state_handler = state_handlers[CharacterStateEnum.IDLE]
+	current_state_handler.enter()
+
 	var detector = get_node_or_null("InteractionDetector")
 	if detector and detector is Area2D:
 		detector.area_entered.connect(_on_interaction_area_entered)
 		detector.area_exited.connect(_on_interaction_area_exited)
 
 func _physics_process(delta):
-	var input_dir = Vector2.ZERO
-	var target_speed = 0.0
-	
-	# Only allow input if the state is IDLE, WALK, or RUN
-	if current_state != CharacterState.DISABLED and current_state != CharacterState.INTERACT:
-		if is_active:
-			input_dir = InputManager.get_movement_vector()
-			
-		if input_dir != Vector2.ZERO:
-			# If shift is pressed, transition to RUN state
-			if Input.is_key_pressed(KEY_SHIFT):
-				current_state = CharacterState.RUN
-				target_speed = run_speed
-			else:
-				current_state = CharacterState.WALK
-				target_speed = speed
-			_play_walk_animation(input_dir)
-		else:
-			current_state = CharacterState.IDLE
-			target_speed = 0.0
-			_play_idle_animation()
-	else:
-		# If DISABLED or INTERACT, decelerate to zero
-		target_speed = 0.0
-		_play_idle_animation()
+	var target_velocity = Vector2.ZERO
+	if current_state_handler:
+		target_velocity = current_state_handler.physics_update(delta)
 		
-	# Move character towards target speed
-	if input_dir != Vector2.ZERO and current_state != CharacterState.DISABLED and current_state != CharacterState.INTERACT:
-		velocity = velocity.move_toward(input_dir * target_speed * speed_modifier, acceleration * delta)
+	# Move character towards target velocity (with speed_modifier for slow environments)
+	if target_velocity != Vector2.ZERO:
+		velocity = velocity.move_toward(target_velocity * speed_modifier, acceleration * delta)
 	else:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 		
@@ -76,12 +72,23 @@ func _physics_process(delta):
 		_update_nearest_interactable()
 
 func _input(event):
+	if current_state_handler:
+		current_state_handler.handle_input(event)
+		
 	# Block interaction inputs if character is disabled or already interacting
-	if current_state == CharacterState.DISABLED or current_state == CharacterState.INTERACT:
+	if current_state == CharacterStateEnum.DISABLED or current_state == CharacterStateEnum.INTERACT:
 		return
 		
 	if is_active and InputManager.is_interact_just_pressed():
 		_trigger_interaction()
+
+func change_state_by_enum(new_state_enum: int):
+	if state_handlers.has(new_state_enum):
+		if current_state_handler:
+			current_state_handler.exit()
+		current_state = new_state_enum
+		current_state_handler = state_handlers[new_state_enum]
+		current_state_handler.enter()
 
 func _play_walk_animation(_direction: Vector2):
 	pass
@@ -109,13 +116,13 @@ func _update_nearest_interactable():
 func _trigger_interaction():
 	_update_nearest_interactable()
 	if nearest_interactable and nearest_interactable.has_method("interact"):
-		current_state = CharacterState.INTERACT
+		change_state_by_enum(CharacterStateEnum.INTERACT)
 		nearest_interactable.interact(self)
 		
 		# Return to IDLE state after a brief delay
 		get_tree().create_timer(0.2).timeout.connect(func():
-			if current_state == CharacterState.INTERACT:
-				current_state = CharacterState.IDLE
+			if current_state == CharacterStateEnum.INTERACT:
+				change_state_by_enum(CharacterStateEnum.IDLE)
 		)
 
 func _on_interaction_area_entered(area: Area2D):

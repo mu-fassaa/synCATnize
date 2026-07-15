@@ -53,3 +53,29 @@ func transition_to_scene(target_scene_path: String, spawn_point_name: String = "
 	InputManager.set_input_locked(false)
 	
 	scene_transition_finished.emit(target_scene_path)
+
+const SCENE_REGISTRY = {
+	"player_house": "res://Scenes/World/PlayerHouse.tscn",
+	"greenhouse": "res://Scenes/World/Greenhouse.tscn",
+	"village": "res://Scenes/World/Village.tscn",
+	"elder_house": "res://Scenes/World/ElderHouse.tscn",
+	"florist": "res://Scenes/World/Florist.tscn",
+	"carpenter": "res://Scenes/World/Carpenter.tscn",
+	"blacksmith": "res://Scenes/World/Blacksmith.tscn",
+	"inn": "res://Scenes/World/Inn.tscn",
+	"empty_house": "res://Scenes/World/EmptyHouse.tscn",
+	"child_house": "res://Scenes/World/ChildHouse.tscn",
+	"forest": "res://Scenes/World/Forest.tscn",
+	"forest_river": "res://Scenes/World/ForestRiver.tscn",
+	"nelayan_house": "res://Scenes/World/NelayanHouse.tscn",
+	"river": "res://Scenes/World/River.tscn",
+	"ancient_shrine": "res://Scenes/World/AncientShrine.tscn",
+	"cliff_shrine": "res://Scenes/World/CliffShrine.tscn"
+}
+
+func transition_to_scene_by_id(scene_id: String, spawn_point_name: String = ""):
+	if SCENE_REGISTRY.has(scene_id):
+		transition_to_scene(SCENE_REGISTRY[scene_id], spawn_point_name)
+	else:
+		print("SceneManager ERROR: Scene ID not registered -> ", scene_id)
+

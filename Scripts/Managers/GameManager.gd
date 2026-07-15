@@ -15,6 +15,7 @@ var active_character: CharacterBody2D = null:
 	set(value):
 		active_character = value
 		active_character_changed.emit(active_character)
+		EventBus.character_switched.emit(active_character)
 
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS # Keep running when tree is paused

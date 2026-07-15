@@ -8,6 +8,7 @@ signal activated(is_on: bool)
 var overlapping_entities: Array[Node2D] = []
 
 func _ready():
+	add_to_group("saveable")
 	# Detect environment solids like boxes (Layer 1) and players/cats (Layer 2)
 	collision_layer = 0
 	collision_mask = 3
@@ -15,6 +16,14 @@ func _ready():
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 	_update_visual()
+
+func get_save_data() -> Dictionary:
+	return { "is_on": is_on }
+
+func load_save_data(data: Dictionary):
+	is_on = data.get("is_on", false)
+	_update_visual()
+	activated.emit(is_on)
 
 func _on_body_entered(body: Node2D):
 	if not overlapping_entities.has(body):

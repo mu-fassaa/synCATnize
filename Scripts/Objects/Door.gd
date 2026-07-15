@@ -5,7 +5,14 @@ extends StaticBody2D
 @onready var collision_shape_2d: CollisionShape2D = $CollisionShape2D
 
 func _ready():
+	add_to_group("saveable")
 	_update_door_state()
+
+func get_save_data() -> Dictionary:
+	return { "is_open": is_open }
+
+func load_save_data(data: Dictionary):
+	set_open(data.get("is_open", false))
 
 func set_open(open_state: bool):
 	is_open = open_state

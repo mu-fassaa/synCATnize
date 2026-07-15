@@ -23,6 +23,7 @@ SceneManager="*res://Scripts/Managers/SceneManager.gd"
 AudioManager="*res://Scripts/Managers/AudioManager.gd"
 SaveManager="*res://Scripts/Managers/SaveManager.gd"
 DebugManager="*res://Scripts/Managers/DebugManager.gd"
+EventBus="*res://Scripts/Managers/EventBus.gd"
 
 [display]
 
