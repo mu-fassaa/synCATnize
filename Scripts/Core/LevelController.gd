@@ -51,6 +51,10 @@ func _unhandled_input(event):
 			_switch_character()
 
 func _switch_character():
+	if not GameManager.is_switch_allowed:
+		print("LevelController: Character switching is locked.")
+		return
+		
 	if ui_prompt_label:
 		ui_prompt_label.visible = false
 		

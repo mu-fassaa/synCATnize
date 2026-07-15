@@ -15,3 +15,7 @@ func _play_walk_animation(direction: Vector2):
 
 func _play_idle_animation():
 	pass
+
+func _on_interact(_actor: CharacterBody2D):
+	if not GameManager.is_switch_allowed:
+		EventBus.event_triggered.emit("met_cat")

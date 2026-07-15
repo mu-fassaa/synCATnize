@@ -27,6 +27,7 @@ EventBus="*res://Scripts/Managers/EventBus.gd"
 AbilityManager="*res://Scripts/Managers/AbilityManager.gd"
 InventoryManager="*res://Scripts/Managers/InventoryManager.gd"
 ObjectiveManager="*res://Scripts/Managers/ObjectiveManager.gd"
+DialogueManager="*res://Scripts/Managers/DialogueManager.gd"
 
 [display]
 

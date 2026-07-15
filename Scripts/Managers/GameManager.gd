@@ -22,6 +22,8 @@ var current_gameplay_state: GameplayState = GameplayState.EXPLORATION:
 			current_gameplay_state = value
 			EventBus.gameplay_state_changed.emit(current_gameplay_state)
 
+var is_switch_allowed: bool = false
+
 var active_character: CharacterBody2D = null:
 	set(value):
 		active_character = value
