@@ -75,7 +75,7 @@ func _play_cat_recruitment_cutscene():
 	GameManager.is_switch_allowed = true
 	
 	# Play recruitment cutscene
-	var cutscene_player = CustomCutscenePlayer.new() if has_node("CustomCutscenePlayer") else CutscenePlayer.new()
+	var cutscene_player = CutscenePlayer.new()
 	add_child(cutscene_player)
 	cutscene_player.play_cutscene("recruitment", timeline)
 	
