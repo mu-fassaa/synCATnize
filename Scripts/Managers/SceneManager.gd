@@ -55,6 +55,7 @@ func transition_to_scene(target_scene_path: String, spawn_point_name: String = "
 	scene_transition_finished.emit(target_scene_path)
 
 const SCENE_REGISTRY = {
+	"main_menu": "res://Scenes/UI/MainMenu.tscn",
 	"player_house": "res://Scenes/World/PlayerHouse.tscn",
 	"greenhouse": "res://Scenes/World/Greenhouse.tscn",
 	"village": "res://Scenes/World/Village.tscn",

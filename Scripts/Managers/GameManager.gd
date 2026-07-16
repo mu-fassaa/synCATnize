@@ -33,6 +33,27 @@ var active_character: CharacterBody2D = null:
 
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS # Keep running when tree is paused
+	
+	# Configure custom mouse cursors dynamically
+	var hover_cursor = load("res://Assets/UI/cursor_hover.png")
+	if hover_cursor:
+		Input.set_custom_mouse_cursor(hover_cursor, Input.CURSOR_POINTING_HAND)
+		
+	var drag_cursor = load("res://Assets/UI/cursor_drag.png")
+	if drag_cursor:
+		Input.set_custom_mouse_cursor(drag_cursor, Input.CURSOR_DRAG)
+
+func _input(event):
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				var click_cursor = load("res://Assets/UI/cursor_click.png")
+				if click_cursor:
+					Input.set_custom_mouse_cursor(click_cursor, Input.CURSOR_ARROW)
+			else:
+				var normal_cursor = load("res://Assets/UI/cursor_normal.png")
+				if normal_cursor:
+					Input.set_custom_mouse_cursor(normal_cursor, Input.CURSOR_ARROW)
 
 func toggle_pause():
 	is_paused = not is_paused

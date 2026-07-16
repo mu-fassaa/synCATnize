@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="synCATnize"
-run/main_scene="res://Scenes/World/PlayerHouse.tscn"
+run/main_scene="res://Scenes/UI/MainMenu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -33,6 +33,7 @@ DialogueManager="*res://Scripts/Managers/DialogueManager.gd"
 
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+mouse_cursor/custom_image="res://Assets/UI/cursor_normal.png"
 
 [input]
 
